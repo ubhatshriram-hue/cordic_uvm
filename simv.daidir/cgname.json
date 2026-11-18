@@ -1,0 +1,56 @@
+{
+    "_vcs_DPI_package": [
+        "_vcs_DPI_package",
+        "uM9F1",
+        "module",
+        1
+    ],
+    "vcs_paramclassrepository": [
+        "vcs_paramclassrepository",
+        "hEeZs",
+        "module",
+        2
+    ],
+    "std": [
+        "std",
+        "reYIK",
+        "module",
+        3
+    ],
+    "uvm_pkg": [
+        "uvm_pkg",
+        "zr7M1",
+        "module",
+        4
+    ],
+    "cordic_package": [
+        "cordic_package",
+        "ZucEr",
+        "module",
+        5
+    ],
+    "cordic_intf": [
+        "cordic_intf",
+        "mwhQN",
+        "module",
+        6
+    ],
+    "CORDIC": [
+        "CORDIC",
+        "YMrVx",
+        "module",
+        7
+    ],
+    "cordic_top": [
+        "cordic_top",
+        "c6751",
+        "module",
+        8
+    ],
+    "...MASTER...": [
+        "SIM",
+        "amcQw",
+        "module",
+        9
+    ]
+}

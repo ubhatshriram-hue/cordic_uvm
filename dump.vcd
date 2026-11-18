@@ -1,0 +1,27 @@
+$date
+	Wed Nov 18 15:21:12 2026
+$end
+
+$version
+	Synopsys VCS version Q-2020.03-SP2-8_Full64
+$end
+
+$timescale
+	1s
+$end
+
+$comment Csum: 1 1ce957121c9a8879 $end
+
+
+$scope module cordic_top $end
+
+$scope begin unnamed$$_vcs_2 $end
+$upscope $end
+
+$upscope $end
+
+$enddefinitions $end
+
+#0
+$dumpvars
+$end

@@ -1,12 +1,12 @@
 `include "cordic_intf.sv"
-`include "cordic.v"
+`include "dut.v"
 //`include "assertion.sv"
-`include "cordic_pkg.sv"
+//`include "cordic_package.sv"
 
 module cordic_top;
 
   import uvm_pkg::*;
-  import cordic_pkg::*;
+  import cordic_package::*;
   bit clk;
   bit rstn;
 
@@ -41,7 +41,7 @@ module cordic_top;
   end
 
   initial begin
-    run_test( );
+    run_test("angle_0" );
   end
 
 endmodule

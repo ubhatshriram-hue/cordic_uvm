@@ -1,4 +1,4 @@
-class cordic_test extends uvm_component;
+class cordic_test extends uvm_test;
   `uvm_component_utils(cordic_test)
   cordic_env env;
   cordic_config cfg;
