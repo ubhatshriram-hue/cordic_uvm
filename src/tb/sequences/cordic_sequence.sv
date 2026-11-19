@@ -396,3 +396,27 @@ class boundary_seq extends uvm_sequence #(cordic_seq_item);
     `uvm_do_with(req, {start==1; ang_mul==0; inp==16'h01FF; err==0;})
   endtask
 endclass
+
+
+
+    class angle_sweep_seq extends uvm_sequence #(cordic_seq_item);
+  `uvm_object_utils(angle_sweep_seq)
+
+  cordic_seq_item req;
+
+  function new(string name = "angle_sweep_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    for (int i = 0; i <= 65535; i++) begin
+      req = cordic_seq_item::type_id::create("req");
+
+      start_item(req);
+      req.start   = 1'b1;
+      req.ang_mul = 1'b1;
+      req.data_in = i;
+      finish_item(req);
+    end
+  endtask
+endclass
