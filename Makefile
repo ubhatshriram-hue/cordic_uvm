@@ -13,7 +13,6 @@ INCDIRS = \
 
 TESTNAME ?= angle_0
 SEED ?= 1234
-JOBS ?= 4
 
 COV_FLAGS = -cm line+cond+fsm+tgl+branch+assert
 OUT_DIR = log_folder
@@ -35,6 +34,8 @@ angle_mul_angle_test \
 mul_ang_mul_test \
 random_angle_test \
 random_mul_test \
+angle_sweep_test \
+mul_sweep_test \
 angle_max_test \
 angle_270_test \
 angle_90_test \
@@ -45,8 +46,6 @@ max_pos_test \
 min_neg_test \
 max_min_test \
 boundary_test
-
-REGRESS_TARGETS = $(foreach t,$(TEST_LIST),regress_run_$(t))
 
 .PHONY: all start compile sim regression cov wave clean git
 .DEFAULT_GOAL := all
@@ -66,41 +65,47 @@ compile:
 	-l $(OUT_DIR)/compile.log $(SOURCE_FILES)
 
 sim:
-	cd $(OUT_DIR) && ./simv -l $(TESTNAME)_simulate.log \
-	$(COV_FLAGS) -cm_dir simv.vdb -cm_name $(TESTNAME) \
-	-cm_log cm_sim.log -key ucli.key \
+	cd $(OUT_DIR) && ./simv \
+	-l $(TESTNAME)_simulate.log \
+	$(COV_FLAGS) \
+	-cm_dir simv.vdb \
+	-cm_name $(TESTNAME) \
+	-cm_log cm_sim.log \
+	-key ucli.key \
 	+fsdbfile+dump.fsdb \
 	+UVM_TESTNAME=$(TESTNAME) \
 	+ntb_random_seed=$(SEED)
 
 regression: compile
 	@echo "=================================================="
-	@echo " CORDIC REGRESSION"
+	@echo " CORDIC UVM REGRESSION"
 	@echo " TESTS : $(words $(TEST_LIST))"
-	@echo " SEED : $(SEED)"
-	@echo " JOBS : $(JOBS)"
+	@echo " SEED  : $(SEED)"
 	@echo "=================================================="
-	-$(MAKE) -k -j$(JOBS) $(REGRESS_TARGETS)
+	@for test in $(TEST_LIST); do \
+		echo ""; \
+		echo "**************************************************"; \
+		echo " RUNNING TEST: $$test"; \
+		echo "**************************************************"; \
+		cd $(OUT_DIR) && ./simv \
+			-l $$test\_$(SEED)_simulate.log \
+			$(COV_FLAGS) \
+			-cm_dir simv.vdb \
+			-cm_name $$test\_$(SEED) \
+			-cm_log $$test\_$(SEED)_cm.log \
+			-key $$test\_$(SEED)_ucli.key \
+			+fsdbfile+$$test\_$(SEED).fsdb \
+			+UVM_TESTNAME=$$test \
+			+ntb_random_seed=$(SEED); \
+		cd ..; \
+	done
+	@echo ""
 	@echo "=================================================="
-	@echo " REGRESSION COMPLETED"
+	@echo " ALL TESTS FINISHED"
 	@echo "=================================================="
-
-$(REGRESS_TARGETS): regress_run_%:
-	@echo "Running $* with seed $(SEED)"
-	@cd $(OUT_DIR) && ./simv \
-	-l $*_$(SEED)_simulate.log \
-	$(COV_FLAGS) \
-	-cm_dir simv.vdb \
-	-cm_name $*_$(SEED) \
-	-cm_log $*_$(SEED)_cm.log \
-	-key $*_$(SEED)_ucli.key \
-	+fsdbfile+$*_$(SEED).fsdb \
-	+UVM_TESTNAME=$* \
-	+ntb_random_seed=$(SEED) > /dev/null
 
 cov:
-	cd $(OUT_DIR) && urg -full64 \
-	-dir simv.vdb -report covReport -log urg.log
+	cd $(OUT_DIR) && urg -full64 -dir simv.vdb -report covReport -log urg.log
 
 wave:
 	cd $(OUT_DIR) && verdi -ssf dump.fsdb &
