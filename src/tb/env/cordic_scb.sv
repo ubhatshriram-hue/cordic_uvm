@@ -22,7 +22,7 @@ bit busy_status;
   real sin_value, cos_value;
   int pass=0;
   int fail=0;
-
+bit test_failed;
   function new(string name="cordic_scb",
                uvm_component parent=null);
     super.new(name,parent);
@@ -124,23 +124,28 @@ endtask
       actual_sin = $signed({out_byte[3],out_byte[2]});
       diff_sin = int'(actual_sin) - int'(expected_sin);
       diff_cos = int'(actual_cos) - int'(expected_cos);
-      if(diff_sin > 5 || diff_sin < -5) begin
-        `uvm_error("SCB",
-          $sformatf("SIN MISMATCH: Expected=%0d Actual=%0d",
-          expected_sin,actual_sin))
-           fail ++;
-      end
-      if(diff_cos > 5 || diff_cos < -5) begin
-        `uvm_error("SCB",
-          $sformatf("COS MISMATCH: Expected=%0d Actual=%0d",
-          expected_cos,actual_cos))
-           fail++;
-      end
-      if((diff_sin <= 5 && diff_sin >= -5) &&
-         (diff_cos <= 5 && diff_cos >= -5)) begin
-        `uvm_info("SCB","ANGLE TEST PASSED",UVM_MEDIUM)
-          pass++;
-      end
+     test_failed = 0;
+
+if(diff_sin > 5 || diff_sin < -5) begin
+  `uvm_error("SCB",
+    $sformatf("SIN MISMATCH: Expected=%0d Actual=%0d",
+    expected_sin,actual_sin))
+  test_failed = 1;
+end
+
+if(diff_cos > 5 || diff_cos < -5) begin
+  `uvm_error("SCB",
+    $sformatf("COS MISMATCH: Expected=%0d Actual=%0d",
+    expected_cos,actual_cos))
+  test_failed = 1;
+end
+
+if(test_failed)
+  fail++;
+else begin
+  `uvm_info("SCB","ANGLE TEST PASSED",UVM_MEDIUM)
+  pass++;
+end
     end
     else begin
 
