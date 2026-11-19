@@ -75,3 +75,20 @@ class err_test extends cordic_test;
     phase.drop_objection(this);
   endtask
 endclass
+
+
+class angle_sweep extends cordic_test;
+  `uvm_component_utils(angle_sweep)
+  angle_sweep_seq s1;
+
+  function new(string name="angle_sweep", uvm_component parent=null);
+    super.new(name, parent);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    s1 = angle_sweep_seq::type_id::create("s1");
+    s1.start(env.agtin.seqr);
+    phase.drop_objection(this);
+  endtask
+endclass

@@ -1,1 +1,3 @@
   CREATE_STREAM @0 {NAME:s0 T:Transactions SCOPE:uvm_test_top.env.agtin.seqr STREAM:769}
+  CREATE_STREAM @0 {NAME:s1 T:Transactions SCOPE:uvm_test_top.env.agtin.seqr STREAM:769}
+  CREATE_STREAM @0 {NAME:s2 T:Transactions SCOPE:uvm_test_top.env.agtin.seqr STREAM:769}

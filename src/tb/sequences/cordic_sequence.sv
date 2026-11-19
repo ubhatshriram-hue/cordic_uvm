@@ -38,3 +38,18 @@ class err_seq extends uvm_sequence#(cordic_seq_item);
   endtask
 
 endclass
+
+
+class angle_sweep_seq extends uvm_sequence#(cordic_seq_item);
+  `uvm_object_utils(angle_sweep_seq)
+
+  function new(string name="angle_sweep_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    for(int i=0;i<65536;i++) begin
+      `uvm_do_with(req, {ang_mul==1; inp==i;})
+    end
+  endtask
+endclass
