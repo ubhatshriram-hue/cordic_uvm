@@ -126,14 +126,14 @@ endtask
       diff_cos = int'(actual_cos) - int'(expected_cos);
      test_failed = 0;
 
-      if(diff_sin > 12 || diff_sin < -12) begin
+      if(diff_sin > 10 || diff_sin < -10) begin
   `uvm_error("SCB",
     $sformatf("SIN MISMATCH: Expected=%0d Actual=%0d",
     expected_sin,actual_sin))
   test_failed = 1;
 end
 
-      if(diff_cos > 12 || diff_cos < -12) begin
+      if(diff_cos > 10 || diff_cos < -10) begin
   `uvm_error("SCB",
     $sformatf("COS MISMATCH: Expected=%0d Actual=%0d",
     expected_cos,actual_cos))
