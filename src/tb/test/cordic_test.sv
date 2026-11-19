@@ -6,7 +6,11 @@ class cordic_test extends uvm_test;
   function new(string name ="cordic_test",uvm_component parent);
     super.new(name, parent);
   endfunction
-  
+ 
+  function void end_of_elaboration_phase(uvm_phase phase);
+    super.end_of_elaboration_phase(phase);
+  endfunction
+ 
   function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     cfg=cordic_config::type_id::create("cfg");
@@ -16,10 +20,7 @@ class cordic_test extends uvm_test;
     env=cordic_env::type_id::create("env",this);
   endfunction
   
-  function void end_of_elaboration_phase(uvm_phase phase);
-   super.end_of_elaboration_phase(phase);
-   uvm_top.print_topology();
- endfunction
+  
   
 endclass
     
@@ -84,7 +85,11 @@ class angle_sweep extends cordic_test;
   function new(string name="angle_sweep", uvm_component parent=null);
     super.new(name, parent);
   endfunction
-
+function void end_of_elaboration_phase(uvm_phase phase);
+    super.end_of_elaboration_phase(phase);
+    uvm_top.set_timeout(1000000000, 0);
+    endfunction
+ 
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
     s1 = angle_sweep_seq::type_id::create("s1");

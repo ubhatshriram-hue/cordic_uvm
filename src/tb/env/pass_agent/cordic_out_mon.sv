@@ -1,7 +1,5 @@
 
-class cordic_out_mon extends uvm_monitor;
 
-  `uvm_component_utils(cordic_out_mon)
 class cordic_out_mon extends uvm_monitor;
 
   `uvm_component_utils(cordic_out_mon)
