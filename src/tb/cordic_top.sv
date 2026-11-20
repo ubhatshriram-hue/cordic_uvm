@@ -19,7 +19,7 @@ module cordic_top;
     rstn = 1;
 
     // Allow DUT to start operating
-    repeat(20) @(posedge clk);
+    repeat(10) @(posedge clk);
 
     // Mid reset
     rstn = 0;
