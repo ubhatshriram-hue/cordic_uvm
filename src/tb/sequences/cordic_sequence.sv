@@ -427,6 +427,6 @@ class angle_90_seq1 extends uvm_sequence #(cordic_seq_item);
   endfunction
 
   task body();
-    `uvm_do_with(req, {start==1; ang_mul==1; inp==16'h4000; err==0;data_inject==1;})
+    `uvm_do_with(req, {start==1; ang_mul==1; inp==16'h4000; err==0;data_inject==1;mode_inject==1;})
   endtask
 endclass
