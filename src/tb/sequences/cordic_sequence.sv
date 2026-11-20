@@ -408,7 +408,7 @@ endclass
  
   task body();
     for(int i=0;i<65536;i++) begin
-      `uvm_do_with(req, {ang_mul==1; inp==i;})
+      `uvm_do_with(req, {ang_mul==1; inp==i;start==1;})
     end
   endtask
 endclass
