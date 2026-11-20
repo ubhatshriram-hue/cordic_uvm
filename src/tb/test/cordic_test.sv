@@ -526,10 +526,10 @@ endclass
 
 
 class angle_90_test1 extends cordic_test;
-  `uvm_component_utils(angle_90_test)
+  `uvm_component_utils(angle_90_test1)
   angle_90_seq1 s;
 
-  function new(string name="angle_90_test", uvm_component parent=null);
+  function new(string name="angle_90_test1", uvm_component parent=null);
     super.new(name,parent);
   endfunction
 
