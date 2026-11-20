@@ -1,12 +1,11 @@
 `include "cordic_intf.sv"
 `include "dut.v"
-//`include "assertion.sv"
-//`include "cordic_package.sv"
 
 module cordic_top;
 
   import uvm_pkg::*;
   import cordic_package::*;
+
   bit clk;
   bit rstn;
 
@@ -14,7 +13,17 @@ module cordic_top;
 
   initial begin
     rstn = 0;
+
+    // Initial reset
     repeat(7) @(posedge clk);
+    rstn = 1;
+
+    // Allow DUT to start operating
+    repeat(20) @(posedge clk);
+
+    // Mid reset
+    rstn = 0;
+    repeat(5) @(posedge clk);
     rstn = 1;
   end
 
@@ -32,17 +41,18 @@ module cordic_top;
     .ENABLE   (vif.enable),
     .DATA_OUT (vif.data_out)
   );
-  
+
   initial begin
-    clk=0;
-    uvm_config_db#(virtual cordic_intf)::set( null,"uvm_test_top","cordic_intf",vif);
+    clk = 0;
+    uvm_config_db#(virtual cordic_intf)::set(
+      null, "uvm_test_top", "cordic_intf", vif
+    );
     $dumpfile("dump.vcd");
     $dumpvars(0);
   end
 
   initial begin
-    run_test("angle_90_test1" );
+    run_test("angle_90_test1");
   end
 
 endmodule
-
