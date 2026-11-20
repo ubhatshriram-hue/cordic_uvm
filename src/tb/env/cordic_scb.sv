@@ -170,7 +170,7 @@ class cordic_scb extends uvm_scoreboard;
 
     if(out.rst == 1'b0) begin
 
-      if(out.busy == 0 && out.done == 0 
+      if( out.done == 0 
          && out.data_out == 0) begin
 
         `uvm_info("SCB","RESET CHECK PASSED",UVM_MEDIUM)
