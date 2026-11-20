@@ -412,3 +412,21 @@ endclass
     end
   endtask
 endclass
+
+
+
+
+
+
+   // ANGLE 90 DEGREE with mode inject 
+class angle_90_seq extends uvm_sequence #(cordic_seq_item);
+  `uvm_object_utils(angle_90_seq)
+
+  function new(string name="angle_90_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    `uvm_do_with(req, {start==1; ang_mul==1; inp==16'h4000; err==0;})
+  endtask
+endclass
