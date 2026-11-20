@@ -521,3 +521,22 @@ function void end_of_elaboration_phase(uvm_phase phase);
     phase.drop_objection(this);
   endtask
 endclass
+
+
+
+
+class angle_90_test1 extends cordic_test;
+  `uvm_component_utils(angle_90_test)
+  angle_90_seq1 s;
+
+  function new(string name="angle_90_test", uvm_component parent=null);
+    super.new(name,parent);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+    s = angle_90_seq::type_id::create("s");
+    s.start(env.agtin.seqr);
+    phase.drop_objection(this);
+  endtask
+endclass
