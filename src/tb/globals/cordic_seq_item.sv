@@ -12,7 +12,7 @@ class cordic_seq_item extends uvm_sequence_item;
   rand bit mode_inject;
   rand bit [15:0] inp;
   bit [7:0] out[4];
-    bit rstn;
+    bit rst;
   constraint c1{
     soft data_inject==0;
     soft mode_inject ==0;
@@ -20,7 +20,7 @@ class cordic_seq_item extends uvm_sequence_item;
   }
   
  `uvm_object_utils_begin(cordic_seq_item)
-  `uvm_field_int(rstn,UVM_ALL_ON)
+  `uvm_field_int(rst,UVM_ALL_ON)
   `uvm_field_int(start,UVM_ALL_ON)
   `uvm_field_int(ang_mul,UVM_ALL_ON)
   `uvm_field_int(data_in,UVM_ALL_ON)
