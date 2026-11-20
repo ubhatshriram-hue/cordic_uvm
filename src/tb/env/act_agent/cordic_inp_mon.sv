@@ -32,6 +32,9 @@ class cordic_inp_mon extends uvm_monitor;
         tr.start = vif.mon_in_cb.start;
         tr.ang_mul = vif.mon_in_cb.ang_mul;
         tr.data_in = vif.mon_in_cb.data_in;
+
+ tr.rstn=vif.rstn;
+      
         ap.write(tr);
         //`uvm_info(get_type_name(),$sformatf("[%0t] Sending DATA item to scb: ang_mul=%0b inp=0x%04h",$time, tr.ang_mul, tr.inp), UVM_MEDIUM)
       end
