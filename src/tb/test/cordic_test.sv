@@ -535,7 +535,7 @@ class angle_90_test1 extends cordic_test;
 
   task run_phase(uvm_phase phase);
     phase.raise_objection(this);
-    s = angle_90_seq::type_id::create("s");
+    s = angle_90_seq1::type_id::create("s");
     s.start(env.agtin.seqr);
     phase.drop_objection(this);
   endtask
