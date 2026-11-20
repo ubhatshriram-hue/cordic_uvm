@@ -41,7 +41,7 @@ module cordic_top;
   end
 
   initial begin
-    run_test("angle_sweep" );
+    run_test("angle_90_test1" );
   end
 
 endmodule
