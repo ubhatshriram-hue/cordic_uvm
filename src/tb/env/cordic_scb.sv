@@ -40,7 +40,7 @@ bit test_failed;
   task input_process();
     forever begin
       inp_mon_fifo.get(inp);
-      if(inp.start == 1'b1&&out.busy!==1)
+      if(inp.start == 1'b1&&busy_status!==1)
         predict(inp);
     end
   endtask
