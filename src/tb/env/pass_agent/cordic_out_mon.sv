@@ -33,7 +33,7 @@ class cordic_out_mon extends uvm_monitor;
         tr.busy = vif.mon_out_cb.busy;
         tr.error = vif.mon_out_cb.error;
         tr.done = vif.mon_out_cb.done;
-        tr.rstn=vif.rstn;
+        tr.rst=vif.rstn;
          ap.write(tr);
          //`uvm_info(get_type_name(),$sformatf("[%0t] Sending DATA item to scb: %0d beat(s): %p", $time, idx, tr.out),UVM_MEDIUM)
        end
