@@ -419,10 +419,10 @@ endclass
 
 
    // ANGLE 90 DEGREE with mode inject 
-class angle_90_seq extends uvm_sequence #(cordic_seq_item);
-  `uvm_object_utils(angle_90_seq)
+class angle_90_seq1 extends uvm_sequence #(cordic_seq_item);
+  `uvm_object_utils(angle_90_seq1)
 
-  function new(string name="angle_90_seq");
+  function new(string name="angle_90_seq1");
     super.new(name);
   endfunction
 
