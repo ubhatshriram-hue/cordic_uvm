@@ -16,14 +16,16 @@ module cordic_top;
 
     // Initial reset
     repeat(7) @(posedge clk);
+    @(negedge clk);
     rstn = 1;
 
     // Allow DUT to start operating
     repeat(10) @(posedge clk);
 
     // Mid reset
+    @(negedge clk);
     rstn = 0;
-  
+
   end
 
   cordic_intf vif (.clk(clk), .rstn(rstn));
