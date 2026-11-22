@@ -23,8 +23,7 @@ module cordic_top;
 
     // Mid reset
     rstn = 0;
-    repeat(5) @(posedge clk);
-    rstn = 1;
+  
   end
 
   cordic_intf vif (.clk(clk), .rstn(rstn));
