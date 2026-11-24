@@ -522,7 +522,30 @@ function void end_of_elaboration_phase(uvm_phase phase);
   endtask
 endclass
 
+class multiplication_sweep extends cordic_test;
+  `uvm_component_utils(multiplication_sweep)
 
+  multiplication_sweep_seq s1;
+
+  function new(string name = "multiplication_sweep",
+               uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void end_of_elaboration_phase(uvm_phase phase);
+    super.end_of_elaboration_phase(phase);
+    uvm_top.set_timeout(1000000000, 0);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+
+    s1 = multiplication_sweep_seq::type_id::create("s1");
+    s1.start(env.agtin.seqr);
+
+    phase.drop_objection(this);
+  endtask
+endclass
 
 
 class angle_90_test1 extends cordic_test;
