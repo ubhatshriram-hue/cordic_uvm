@@ -3,6 +3,9 @@
 # CORDIC UVM MAKEFILE
 # ==============================================================================
 
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+
 SOURCE_FILES = \
 	src/tb/globals/cordic_package.sv \
 	src/tb/cordic_top.sv
@@ -18,15 +21,14 @@ INCDIRS = \
 	+incdir+src/tb/test
 
 TESTNAME ?= angle_0
-
-SEED = 1
+SEED ?= 1
 
 COV_FLAGS = -cm line+cond+fsm+tgl+branch+assert
 
 OUT_DIR = log_folder
 
 # ==============================================================================
-# ALL 28 TESTS
+# REGRESSION TEST LIST
 # ==============================================================================
 
 TEST_LIST = \
@@ -58,10 +60,10 @@ TEST_LIST = \
 	boundary_test
 
 # ==============================================================================
-# DEFAULT TARGET
+# TARGETS
 # ==============================================================================
 
-.PHONY: all start compile sim regression cov wave clean git
+.PHONY: all start compile sim regression all_cov wave clean git
 
 .DEFAULT_GOAL := all
 
@@ -88,23 +90,32 @@ compile:
 	-l $(OUT_DIR)/compile.log $(SOURCE_FILES)
 
 # ==============================================================================
-# RUN ONE TEST MANUALLY
+# RUN ONE TEST
+#
+# Normal:
+# make sim TESTNAME=angle_0
+#
+# With mid-reset:
+# make sim TESTNAME=angle_0 MID_RESET=1
 # ==============================================================================
+
+MID_RESET ?= 0
 
 sim:
 	cd $(OUT_DIR) && ./simv \
 	-l $(TESTNAME)_simulate.log \
 	$(COV_FLAGS) \
 	-cm_dir simv.vdb \
-	-cm_name $(TESTNAME) \
-	-cm_log cm_sim.log \
-	-key ucli.key \
-	+fsdbfile+dump.fsdb \
+	-cm_name $(TESTNAME)_single \
+	-cm_log $(TESTNAME)_cm.log \
+	-key $(TESTNAME)_ucli.key \
+	+fsdbfile+$(TESTNAME).fsdb \
 	+UVM_TESTNAME=$(TESTNAME) \
+	$(if $(filter 1,$(MID_RESET)),+MID_RESET,) \
 	+ntb_random_seed=$(SEED)
 
 # ==============================================================================
-# REGRESSION - ALL 28 TESTS, SEED = 1, FULL OUTPUT IN TERMINAL AND ONE LOG
+# RUN ALL REGRESSION TESTS
 # ==============================================================================
 
 regression: compile
@@ -112,17 +123,17 @@ regression: compile
 	@echo "             CORDIC UVM REGRESSION"
 	@echo "=========================================================="
 	@echo " Total tests : $(words $(TEST_LIST))"
-	@echo " Seed       : $(SEED)"
-	@echo " Mode       : Sequential"
-	@echo " Full log   : $(OUT_DIR)/regression_seed_1.log"
+	@echo " Seed        : $(SEED)"
 	@echo "=========================================================="
-	@rm -f $(OUT_DIR)/regression_seed_1.log
+
+	@rm -f $(OUT_DIR)/regression_seed_$(SEED).log
+
 	@for test in $(TEST_LIST); do \
 		echo ""; \
-		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_1.log; \
-		echo " RUNNING TEST: $$test | SEED: $(SEED)" | tee -a $(OUT_DIR)/regression_seed_1.log; \
-		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_1.log; \
-		cd $(OUT_DIR) && ./simv \
+		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		echo " RUNNING TEST: $$test | SEED: $(SEED)" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		(cd $(OUT_DIR) && ./simv \
 			$(COV_FLAGS) \
 			-cm_dir simv.vdb \
 			-cm_name $$test \
@@ -130,50 +141,107 @@ regression: compile
 			-key $$test\_ucli.key \
 			+fsdbfile+$$test.fsdb \
 			+UVM_TESTNAME=$$test \
-			+ntb_random_seed=$(SEED) 2>&1 | tee -a regression_seed_1.log; \
-		cd ..; \
+			+ntb_random_seed=$(SEED)) \
+			2>&1 | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
 	done
-	@echo ""; \
-	echo "=========================================================="; \
-	echo "             REGRESSION COMPLETED"; \
-	echo "             ALL 28 TESTS EXECUTED"; \
-	echo "             SEED = $(SEED)"; \
-	echo "             LOG = $(OUT_DIR)/regression_seed_1.log"; \
-	echo "=========================================================="
+
+	@echo "REGRESSION COMPLETED"
 
 # ==============================================================================
-# COVERAGE REPORT
+# COMPLETE COVERAGE FLOW
+#
+# 1. Compile
+# 2. Create fresh coverage database
+# 3. Run selected test with mid-reset
+# 4. Run all regression tests normally
+# 5. Generate combined coverage report
 # ==============================================================================
 
-cov:
+all_cov: compile
+	@echo ""
+	@echo "=========================================================="
+	@echo "           CORDIC COMPLETE COVERAGE FLOW"
+	@echo "=========================================================="
+	@echo " Mid-reset test : $(TESTNAME)"
+	@echo " Regression     : $(words $(TEST_LIST)) tests"
+	@echo " Seed           : $(SEED)"
+	@echo "=========================================================="
+
+	@rm -rf $(OUT_DIR)/simv.vdb $(OUT_DIR)/covReport
+
+	@echo ""
+	@echo "========== RUNNING SELECTED TEST WITH MID-RESET =========="
+
+	@(cd $(OUT_DIR) && ./simv \
+		$(COV_FLAGS) \
+		-cm_dir simv.vdb \
+		-cm_name midreset_$(TESTNAME) \
+		-cm_log midreset_$(TESTNAME)_cm.log \
+		-key midreset_$(TESTNAME)_ucli.key \
+		+fsdbfile+midreset_$(TESTNAME).fsdb \
+		+UVM_TESTNAME=$(TESTNAME) \
+		+MID_RESET \
+		+ntb_random_seed=$(SEED)) \
+		2>&1 | tee $(OUT_DIR)/midreset_$(TESTNAME).log
+
+	@echo ""
+	@echo "========== RUNNING NORMAL REGRESSION ==========="
+
+	@rm -f $(OUT_DIR)/regression_seed_$(SEED).log
+
+	@for test in $(TEST_LIST); do \
+		echo ""; \
+		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		echo " RUNNING TEST: $$test | SEED: $(SEED)" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		(cd $(OUT_DIR) && ./simv \
+			$(COV_FLAGS) \
+			-cm_dir simv.vdb \
+			-cm_name $$test \
+			-cm_log $$test\_cm.log \
+			-key $$test\_ucli.key \
+			+fsdbfile+$$test.fsdb \
+			+UVM_TESTNAME=$$test \
+			+ntb_random_seed=$(SEED)) \
+			2>&1 | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+	done
+
+	@echo ""
+	@echo "========== GENERATING COMBINED COVERAGE =========="
+
 	cd $(OUT_DIR) && urg -full64 \
-	-dir simv.vdb \
-	-report covReport \
-	-log urg.log
+		-dir simv.vdb \
+		-report covReport \
+		-log urg.log
+
+	@echo ""
+	@echo "=========================================================="
+	@echo "          COVERAGE GENERATION COMPLETED"
+	@echo "=========================================================="
+	@echo " Mid-reset test : $(TESTNAME)"
+	@echo " Regression     : COMPLETED"
+	@echo " Coverage       : $(OUT_DIR)/covReport"
+	@echo "=========================================================="
 
 # ==============================================================================
-# OPEN WAVEFORM IN VERDI
+# OPEN WAVEFORM
+#
+# Normal:
+# make wave TESTNAME=angle_0
+#
+# Mid-reset waveform:
+# make wave TESTNAME=midreset_angle_0
 # ==============================================================================
 
 wave:
-	cd $(OUT_DIR) && verdi -ssf dump.fsdb &
+	cd $(OUT_DIR) && verdi -ssf $(TESTNAME).fsdb &
 
 # ==============================================================================
-# CLEAN GENERATED FILES
+# CLEAN ALL GENERATED FILES
 # ==============================================================================
 
 clean:
-	rm -rf $(OUT_DIR)/simv* \
-	$(OUT_DIR)/csrc* \
-	$(OUT_DIR)/*.log \
-	$(OUT_DIR)/*.vpd \
-	$(OUT_DIR)/*.fsdb \
-	$(OUT_DIR)/*.key \
-	$(OUT_DIR)/*.vdb \
-	$(OUT_DIR)/verdiLog \
-	$(OUT_DIR)/novas* \
-	$(OUT_DIR)/covReport \
-	DVEfiles
+	rm -rf $(OUT_DIR) DVEfiles
 
 # ==============================================================================
 # GIT AUTOMATION
