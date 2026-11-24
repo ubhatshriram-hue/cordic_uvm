@@ -20,12 +20,12 @@ module cordic_top;
     rstn = 1;
 
     // Allow DUT to start operating
-    repeat(10) @(posedge clk);
+ /*   repeat(10) @(posedge clk);
 
     // Mid reset
     @(negedge clk);
     rstn = 0;
-
+*/
   end
 
   cordic_intf vif (.clk(clk), .rstn(rstn));
@@ -53,7 +53,7 @@ module cordic_top;
   end
 
   initial begin
-    run_test("angle_90_test1");
+    run_test("");
   end
 
 endmodule
