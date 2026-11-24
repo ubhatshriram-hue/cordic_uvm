@@ -57,7 +57,8 @@ TEST_LIST = \
 	max_pos_test \
 	min_neg_test \
 	max_min_test \
-	boundary_test
+	boundary_test\
+    angle_sweep
 
 # ==============================================================================
 # TARGETS
