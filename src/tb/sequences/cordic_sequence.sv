@@ -413,7 +413,24 @@ endclass
   endtask
 endclass
 
+class multiplication_sweep_seq extends uvm_sequence#(cordic_seq_item);
+  `uvm_object_utils(multiplication_sweep_seq)
 
+  function new(string name = "multiplication_sweep_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    for (int i = 0; i < 65536; i++) begin
+      `uvm_do_with(req, {
+        ang_mul == 0;
+        inp == i;
+        start == 1;
+      })
+    end
+  endtask
+
+endclass
 
 
 
