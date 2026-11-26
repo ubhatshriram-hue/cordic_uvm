@@ -1,6 +1,4 @@
-# CORDIC UVM MAKEFILE
 
-makefile
 # ==============================================================================
 # CORDIC UVM MAKEFILE
 # ==============================================================================
@@ -95,7 +93,6 @@ compile:
 
 # ==============================================================================
 # RUN ONE TEST
-# Coverage is accumulated in the same simv.vdb database.
 # ==============================================================================
 
 sim:
@@ -111,7 +108,6 @@ sim:
 
 # ==============================================================================
 # RUN ALL REGRESSION TESTS
-# Coverage is accumulated. Database is NOT cleared.
 # ==============================================================================
 
 regression: compile
@@ -151,8 +147,8 @@ wave:
 	cd $(OUT_DIR) && verdi -ssf $(TESTNAME).fsdb &
 
 # ==============================================================================
-# CLEAN ALL GENERATED FILES
-# This is the ONLY target that clears accumulated coverage.
+# CLEAN
+# ONLY make clean clears the coverage database.
 # ==============================================================================
 
 clean:
@@ -168,5 +164,3 @@ git:
 	git add src/ Makefile *.md; \
 	git commit -m "$$msg"; \
 	git push
-
-
