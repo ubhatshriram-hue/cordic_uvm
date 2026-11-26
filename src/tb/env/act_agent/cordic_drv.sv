@@ -70,6 +70,7 @@ class cordic_drv extends uvm_driver#(cordic_seq_item);
     vif.drv_cb.ang_mul <= ~req.ang_mul;
     
     if(req.err) begin
+        vif.drv_cb.start<=1;
       err_cycle =  $urandom_range(1,19);
       
       repeat(err_cycle)
