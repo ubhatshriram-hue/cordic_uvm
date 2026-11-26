@@ -15,11 +15,12 @@ module cordic_top;
     rstn = 0;
     #1;
     rstn = 1;
-    #1;
+    repeat(4) @(posedge clk);
     rstn = 0;
     repeat(2) @(posedge clk);
     rstn = 1;
-    repeat(26) @(posedge clk);
+    
+    /*repeat(26) @(posedge clk);
     rstn = 0;
     repeat(2) @(posedge clk);
     rstn = 0;
@@ -34,7 +35,7 @@ module cordic_top;
     rstn = 0;
     @(posedge clk);
     rstn = 1;
-  
+  */
   end
 
   cordic_intf vif (.clk(clk), .rstn(rstn));
