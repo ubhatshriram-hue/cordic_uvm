@@ -565,7 +565,7 @@ class angle_90_test1 extends cordic_test;
 endclass
 
 
-class err_ang_test extends cordic_base_test;
+class err_ang_test extends cordic_test;
   `uvm_component_utils(err_ang_test)
 
   function new(string name="err_ang_test", uvm_component parent=null);
