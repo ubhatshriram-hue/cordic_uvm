@@ -13,19 +13,24 @@ module cordic_top;
 
   initial begin
     rstn = 0;
-
-    // Initial reset
-    repeat(7) @(posedge clk);
-    @(negedge clk);
+    #1;
+    rstn = 1;
+    #1;
+    rstn = 0;
+    repeat(2) @(posedge clk);
     rstn = 1;
 
-    // Allow DUT to start operating
-  /*repeat(10) @(posedge clk);
-
-    // Mid reset
-    @(negedge clk);
+    /*
+    repeat(30) @(posedge clk);
     rstn = 0;
-*/
+    @(posedge clk);
+    rstn = 1;
+
+    repeat(38) @(posedge clk);
+    rstn = 0;
+    @(posedge clk);
+    rstn = 1;
+    */
   end
 
   cordic_intf vif (.clk(clk), .rstn(rstn));
@@ -49,7 +54,7 @@ module cordic_top;
       null, "uvm_test_top", "cordic_intf", vif
     );
     $dumpfile("dump.vcd");
-    $dumpvars(0);
+    $dumpvars(0, cordic_top);
   end
 
   initial begin
