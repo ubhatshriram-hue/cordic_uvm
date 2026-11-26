@@ -578,7 +578,7 @@ class err_ang_test extends cordic_test;
     phase.raise_objection(this);
 
     seq = err_ang_seq::type_id::create("seq");
-    seq.start(env.act_agent.sequencer);
+    seq.start(env.agtin.seqr);
 
     phase.drop_objection(this);
   endtask
