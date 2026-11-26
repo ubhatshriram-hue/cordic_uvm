@@ -58,7 +58,8 @@ TEST_LIST = \
 	max_min_test \
 	boundary_test \
 	angle_sweep \
-	multiplication_sweep
+	multiplication_sweep\
+err_ang_test
 
 # ==============================================================================
 # TARGETS
