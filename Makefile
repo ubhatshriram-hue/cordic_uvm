@@ -1,4 +1,3 @@
-
 # ==============================================================================
 # CORDIC UVM MAKEFILE
 # ==============================================================================
@@ -65,11 +64,32 @@ TEST_LIST = \
 # TARGETS
 # ==============================================================================
 
-.PHONY: all start compile sim regression wave clean git
+.PHONY: all help start compile sim regression report wave clean git
 
 .DEFAULT_GOAL := all
 
-all: compile sim
+all: sim
+
+# ==============================================================================
+# HELP
+# ==============================================================================
+
+help:
+	@echo ""
+	@echo "============== CORDIC UVM MAKE OPTIONS =============="
+	@echo " make                         : Compile + run angle_0"
+	@echo " make compile                  : Compile testbench"
+	@echo " make sim TESTNAME=<test>      : Run single test"
+	@echo " make sim TESTNAME=<test> SEED=<n>"
+	@echo "                              : Run test with seed"
+	@echo " make regression              : Run all 28 tests"
+	@echo " make report                  : Generate coverage HTML report"
+	@echo " make wave TESTNAME=<test>     : Open FSDB waveform"
+	@echo " make start                   : Start Synopsys environment"
+	@echo " make clean                   : Clear generated files + coverage"
+	@echo " make git                     : Commit and push"
+	@echo "=================================================="
+	@echo ""
 
 # ==============================================================================
 # START SYNOPSYS ENVIRONMENT
@@ -80,6 +100,7 @@ start:
 
 # ==============================================================================
 # COMPILE
+# Does not intentionally clear coverage database.
 # ==============================================================================
 
 compile:
@@ -93,10 +114,12 @@ compile:
 
 # ==============================================================================
 # RUN ONE TEST
+# Runs one test and refreshes coverage report.
 # ==============================================================================
 
-sim:
-	cd $(OUT_DIR) && ./simv \
+sim: compile
+	@sim_status=0; \
+	(cd $(OUT_DIR) && ./simv \
 		-l $(TESTNAME)_simulate.log \
 		$(COV_FLAGS) \
 		-cm_dir simv.vdb \
@@ -104,28 +127,32 @@ sim:
 		-cm_log $(TESTNAME)_cm.log \
 		+fsdbfile+$(TESTNAME).fsdb \
 		+UVM_TESTNAME=$(TESTNAME) \
-		+ntb_random_seed=$(SEED)
+		+ntb_random_seed=$(SEED)) || sim_status=$$?; \
+	$(MAKE) report; \
+	exit $$sim_status
 
 # ==============================================================================
 # RUN ALL REGRESSION TESTS
+# Coverage is accumulated. Database is NOT cleared.
+# Continues running even if a test fails.
 # ==============================================================================
 
 regression: compile
-	@echo "=========================================================="
-	@echo "             CORDIC UVM REGRESSION"
-	@echo "=========================================================="
-	@echo " Total tests : $(words $(TEST_LIST))"
-	@echo " Seed       : $(SEED)"
-	@echo "=========================================================="
-
-	@rm -f $(OUT_DIR)/regression_seed_$(SEED).log
-
-	@for test in $(TEST_LIST); do \
+	@failed=0; \
+	failed_tests=""; \
+	rm -f $(OUT_DIR)/regression_seed_$(SEED).log; \
+	echo "=========================================================="; \
+	echo "             CORDIC UVM REGRESSION"; \
+	echo "=========================================================="; \
+	echo " Total tests : $(words $(TEST_LIST))"; \
+	echo " Seed        : $(SEED)"; \
+	echo "=========================================================="; \
+	for test in $(TEST_LIST); do \
 		echo ""; \
 		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
 		echo " RUNNING TEST: $$test | SEED: $(SEED)" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
 		echo "##########################################################" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
-		(cd $(OUT_DIR) && ./simv \
+		if (cd $(OUT_DIR) && ./simv \
 			$(COV_FLAGS) \
 			-cm_dir simv.vdb \
 			-cm_name $$test \
@@ -133,11 +160,35 @@ regression: compile
 			+fsdbfile+$$test.fsdb \
 			+UVM_TESTNAME=$$test \
 			+ntb_random_seed=$(SEED)) \
-			2>&1 | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
-	done
+			2>&1 | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; then \
+			echo "PASS: $$test" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+		else \
+			echo "FAIL: $$test" | tee -a $(OUT_DIR)/regression_seed_$(SEED).log; \
+			failed=1; \
+			failed_tests="$$failed_tests $$test"; \
+		fi; \
+	done; \
+	echo ""; \
+	echo "============== REGRESSION SUMMARY =============="; \
+	if [ $$failed -eq 0 ]; then \
+		echo "ALL TESTS PASSED"; \
+	else \
+		echo "FAILED TESTS: $$failed_tests"; \
+	fi; \
+	echo "============================================"; \
+	$(MAKE) report; \
+	if [ $$failed -ne 0 ]; then exit 1; fi
 
-	@echo ""
-	@echo "REGRESSION COMPLETED"
+# ==============================================================================
+# GENERATE COVERAGE REPORT
+# Uses accumulated coverage database.
+# ==============================================================================
+
+report:
+	urg -full64 \
+		-dir $(OUT_DIR)/simv.vdb \
+		-report $(OUT_DIR)/covReport \
+		-log $(OUT_DIR)/urg.log
 
 # ==============================================================================
 # OPEN WAVEFORM
@@ -148,11 +199,11 @@ wave:
 
 # ==============================================================================
 # CLEAN
-# ONLY make clean clears the coverage database.
+# ONLY make clean clears accumulated coverage.
 # ==============================================================================
 
 clean:
-	rm -rf $(OUT_DIR) DVEfiles
+	rm -rf $(OUT_DIR) DVEfiles simv.vdb csrc
 
 # ==============================================================================
 # GIT AUTOMATION
