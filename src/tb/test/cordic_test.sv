@@ -563,3 +563,24 @@ class angle_90_test1 extends cordic_test;
     phase.drop_objection(this);
   endtask
 endclass
+
+
+class err_ang_test extends cordic_base_test;
+  `uvm_component_utils(err_ang_test)
+
+  function new(string name="err_ang_test", uvm_component parent=null);
+    super.new(name, parent);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    err_ang_seq seq;
+
+    phase.raise_objection(this);
+
+    seq = err_ang_seq::type_id::create("seq");
+    seq.start(env.act_agent.sequencer);
+
+    phase.drop_objection(this);
+  endtask
+
+endclass
