@@ -15,7 +15,8 @@ module cordic_top;
     rstn = 0;
     #1;
     rstn = 1;
-    repeat(4) @(posedge clk);
+   // repeat(4) @(posedge clk);
+    #1
     rstn = 0;
     repeat(2) @(posedge clk);
     rstn = 1;
