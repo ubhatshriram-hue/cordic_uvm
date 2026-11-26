@@ -447,3 +447,24 @@ class angle_90_seq1 extends uvm_sequence #(cordic_seq_item);
     `uvm_do_with(req, {start==1; ang_mul==1; inp==16'h4000; err==0;data_inject==1;mode_inject==1;})
   endtask
 endclass
+
+
+
+    class err_ang_seq extends uvm_sequence#(cordic_seq_item);
+  `uvm_object_utils(err_ang_seq)
+
+  function new(string name="err_ang_seq");
+    super.new(name);
+  endfunction
+
+  task body();
+    repeat(25) begin
+      `uvm_do_with(req, {
+        ang_mul == 1;
+        inp     == 16'h0205;
+        err     == 1;
+      })
+    end
+  endtask
+
+endclass
